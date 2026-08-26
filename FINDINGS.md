@@ -281,3 +281,94 @@ the index's own loss input, it is licensed, and apportioning NOAA zone events to
 counties is a large part of what it sells. Doing it independently is legitimate —
 and it means the apportionment rule is ours, not FEMA's, and must be stated
 wherever it bears.
+
+---
+
+## M2-T1 — Name matching recovers the missing damage, and it was validated rather than assumed
+
+**Method.** The 37.7% of zone damage that matched no zone key was diagnosed
+before any fix was attempted. The cause is **zone renumbering**, confirmed: NOAA
+codes Louisiana zone 41 as `CALCASIEU` in 2020, while the April 2026 crosswalk
+maps Louisiana zones 1-254 to entirely different names.
+
+The unmatched zone *names* are recoverable, though: `CALCASIEU`,
+`LOWER LAFOURCHE`, `UPPER TERREBONNE` are Louisiana parishes split into
+directional sub-zones. Stripping the qualifier resolves them.
+
+**A name match is weaker evidence than an id match** — the same problem Downfall
+recorded on `short_name` — so it was measured before it was used.
+
+### The validation
+
+126,549 events are resolvable by **both** id and name. Comparing the two:
+
+| | |
+|---|---|
+| Name result overlaps id result | **99.48%** |
+| Name result identical to id result | 98.35% |
+| **Damage-weighted overlap** | **99.87%** |
+
+The second pass reproduces the first almost exactly where both are available,
+which is what licenses using it where only the second exists.
+
+### What it recovers
+
+| Method | Events | Damage | Share |
+|---|---|---|---|
+| County FIPS, direct | 237,786 | $31.45 bn | 28.0% |
+| Zone id | 173,169 | $50.51 bn | 44.9% |
+| **Zone name (new)** | **3,877** | **$20.45 bn** | **18.2%** |
+| **Attributed** | **414,832** | **$102.4 bn** | **91.1%** |
+| Unmatched | 24,319 | $10.06 bn | 8.9% |
+
+**Attribution rises from 72.9% to 91.1% of all damage dollars.** Every row records
+which pass produced it, so the join remains auditable.
+
+0.14% of attributed damage carries an event type with no NRI hazard equivalent —
+heavy rain, dense fog, funnel cloud, high surf — and is dropped rather than
+forced into a category.
+
+---
+
+## M2-T2 — The testable share holds at 70.97%, and earthquake is simply absent
+
+After the per-hazard out-of-sample boundary (§4.1): **70,580 county-year-hazard
+rows, $63.97 bn of loss.**
+
+| | Share of index EAL |
+|---|---|
+| Hazards with 100+ counties reporting out-of-sample loss | **70.97%** |
+| Thin — tsunami, volcanic | 0.33% |
+| **Absent — earthquake (27.04%), coastal flooding (1.67%)** | **28.71%** |
+
+**Against the §6 / §11.1 threshold of 50% — PASS.**
+
+**Earthquake has no out-of-sample rows at all.** NOAA Storm Events does not cover
+earthquakes. F0-T3 predicted it would be untestable on timescale grounds; it is
+in fact untestable on *instrument* grounds, which is a stronger statement. A
+quarter of the index cannot be scored here by any means available.
+
+---
+
+## M2-T3 — A specification error, found by looking at heat waves
+
+| Hazard | Out-of-sample counties | Realized damage | Index EAL share |
+|---|---|---|---|
+| Heat Wave | 1,431 | **$36,020** | 3.01% |
+| Cold Wave | 2,219 | $77.1 M | 1.23% |
+
+Heat waves appear in 1,431 counties and cause essentially **no property damage**.
+That is not a data defect. Heat kills people; it does not flatten buildings.
+
+The index's `EALT` is a **composite of building, population and agriculture**
+consequence, with population loss converted to dollars. NOAA's
+`DAMAGE_PROPERTY + DAMAGE_CROPS` measures **buildings and crops only**.
+
+**Scoring `EALT` against property damage is a category error**, and it would have
+made the index look badly wrong on precisely the hazards whose harm is counted in
+lives. Comparing building-and-agriculture EAL against building-and-crop damage is
+the like-for-like test.
+
+`PREREGISTRATION.md` v1.2 fixes the comparison as **`{HAZ}_EALB + {HAZ}_EALA`
+against `DAMAGE_PROPERTY + DAMAGE_CROPS`**, before any correlation is computed.
+The population component is out of scope and said to be.

@@ -1,9 +1,20 @@
 # Actuary — Pre-registration
 
-**v1.1 — written 2026-08-26. Amends v1.0 of the same day, after M1 measured the
-outcome data and before any correlation has been computed.**
+**v1.2 — written 2026-08-26. Amends v1.1 of the same day, after M2 built the
+attribution and before any correlation has been computed.**
 
-**Amendment made after seeing a result.** M1 found that only **28.0%** of NOAA
+**v1.2 amendment, made after seeing a result.** M2 found that heat waves appear
+in 1,431 counties with $36,020 of property damage against a 3.01% share of the
+index. The index's `EALT` counts building, population and agriculture
+consequence; NOAA damage counts buildings and crops. Scoring one against the
+other is a category error that would have made the index look wrong on every
+hazard whose harm is counted in lives. **§3 now fixes the comparison as
+`{HAZ}_EALB + {HAZ}_EALA` against `DAMAGE_PROPERTY + DAMAGE_CROPS`**, and the
+population component is declared out of scope.
+
+**v1.1 amendment, retained.**
+
+M1 found that only **28.0%** of NOAA
 damage dollars carry a county FIPS — hurricane, 45.2% of all damage and 29.25%
 of the index's dollar value, is **entirely** zone-coded. Taken at face value that
 puts the testable share near 26%, **below the 50% floor in §6, and the project
@@ -84,7 +95,14 @@ every headline**, in those words.
 
 ## §3 The outcome, fixed before any of it is downloaded
 
-**Primary outcome: direct property damage**, in dollars, by county, by year.
+**Primary outcome: direct property and crop damage**, in dollars, by county, by
+year — compared against **`{HAZ}_EALB + {HAZ}_EALA`**, the index's building and
+agriculture components.
+
+**The population component (`EALP`) is out of scope**, and `EALT` is never used
+as the predictor. Heat and cold waves carry substantial `EALT` almost entirely as
+population consequence, and measuring that against building damage would score
+the index wrong for being right (M2-T3).
 
 - **NOAA Storm Events** `DAMAGE_PROPERTY` + `DAMAGE_CROPS`, aggregated to county
   and year, inflation-adjusted to 2020 dollars to match the index's own basis.
@@ -129,7 +147,8 @@ public NWS zone–county correlation file, and the rules are fixed here:
 |---|---|---|
 | Zone maps to exactly one county | 57.7% | Assign in full |
 | Zone maps to several counties | 4.6% | **Split equally** among them |
-| Zone key not in the crosswalk | 37.7% | **Excluded, and the excluded total published** beside every figure |
+| Zone key absent, but zone NAME resolves | 18.2% of all damage | **Second pass, flagged `zone_name`.** Validated at 99.87% damage-weighted agreement against zones resolvable both ways (M2-T1) |
+| Neither id nor name resolves | 8.9% of all damage | **Excluded, and the excluded total published** beside every figure |
 
 **Equal splitting is chosen over population or building-value weighting** because
 both of those are components of the index's own exposure term, and weighting the
@@ -281,4 +300,5 @@ assistance uptake, and the per-hazard boundaries may not be moved.
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-08-26 | Initial. Committed after the literature search and after the index was profiled, before any outcome data was downloaded. |
+| 1.2 | 2026-08-26 | §3 comparison fixed to `EALB + EALA` against property and crop damage, after M2-T3 found a category error; population component declared out of scope. §4.0 gains the validated name-match second pass. |
 | 1.1 | 2026-08-26 | §4.0 added — zone-to-county attribution, with the apportionment rule and the treatment of unmatched zones fixed before any correlation exists. §6 gains a reporting-rate kill criterion after M1-T1 measured a 50.4 point interstate spread. Written after M1 measured the outcome data, before any join to the index. |
