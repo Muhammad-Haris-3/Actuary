@@ -661,3 +661,112 @@ better.
 (M6). Every number above rests on NOAA, and NOAA shares its lineage with SHELDUS,
 the index's own loss input. **Until M6 runs, no result here has been checked
 against an instrument the index did not partly come from.**
+
+---
+
+## M6-T1 — The two instruments barely agree on which counties flooded
+
+**Method.** 972,470 NFIP claims from 2010 onward, $51.07 bn paid, 2,747 counties,
+pulled from the OpenFEMA API. Insurance records, not storm reports: a different
+collector, a different incentive, a different failure mode. Out-of-sample window
+for riverine flooding is 2020 onward (boundary 2019).
+
+| | |
+|---|---|
+| NFIP paid, 2020 onward | **$18.53 bn** across 2,250 counties |
+| NOAA flood damage, same window | $14.81 bn |
+| **Spearman between them, per county** | **0.401** |
+| ... among counties positive in both (n=1,332) | **0.334** |
+| Counties with NOAA loss but no NFIP claim | 410 |
+| Counties with NFIP claim but no NOAA loss | 729 |
+
+**Two measurements of the same thing correlate at 0.40.**
+
+This is a measurement finding and `PREREGISTRATION.md` §6 requires it be published
+as one rather than resolved by picking the more convenient instrument. It also
+sets a ceiling: **no predictor can score much above 0.40 against both instruments
+at once**, because the instruments do not agree with each other that well. Every
+correlation in M3 should be read against that ceiling.
+
+---
+
+## M6-T2 — The independent instrument undermines the M3 headline
+
+This is the result the project exists to be able to find, and it goes against the
+previous milestone.
+
+**Riverine flooding, out-of-sample, four predictors, two outcomes:**
+
+| Predictor | → NFIP paid (rho / AUC) | → NOAA damage (rho / AUC) |
+|---|---|---|
+| **Index EAL, riverine** | **0.438 / 0.727** | 0.303 / 0.642 |
+| **Index EAL, riverine + coastal** | **0.490 / 0.743** | 0.286 / 0.630 |
+| Naive, **same** instrument 2010-19 | **0.676 / 0.845** | **0.334 / 0.669** |
+| Naive, **other** instrument 2010-19 | 0.284 / 0.635 | 0.274 / 0.639 |
+
+Read the last two rows against each other. They are the same idea — extrapolate
+the past decade — differing only in which instrument recorded that past.
+
+| | Index beats naive? |
+|---|---|
+| Naive drawn from the **same** instrument as the outcome | **No.** 0.438 vs 0.676 |
+| Naive drawn from the **other** instrument | **Yes.** 0.438 vs 0.284 |
+
+### What this means
+
+M3 reported that naive extrapolation beats the index on ten of thirteen hazards,
+and M3-T3 showed that survived a reporting-rate control. **M6 shows the control
+was insufficient.**
+
+A naive baseline tested on the instrument it was built from carries that
+instrument's own persistence — a county that generated NFIP claims in 2010-2019
+has flood policies in force, and generates claims again in 2020-2026 partly for
+that reason rather than because it floods more. NOAA carries the analogous
+persistence in county reporting habit. **M3-T3 controlled for reporting at the
+state level; this confound lives at the county level and passed straight through
+it.**
+
+Strip it by drawing the naive baseline from the other instrument, and the
+ordering reverses: the index wins on both outcomes (0.438 vs 0.284 predicting
+NFIP; 0.303 vs 0.274 predicting NOAA).
+
+### What it does not mean
+
+**This does not vindicate the index.** Three limits, all binding:
+
+1. **It is one hazard.** Flood is the only hazard with two instruments. The other
+   twelve have no independent check, and nothing here licenses assuming the same
+   correction applies to them.
+2. **The cross-instrument test is noisier**, and its margins are smaller than the
+   within-instrument ones it overturns.
+3. **The index still loses to the same-instrument baseline**, and a practitioner
+   holding NFIP history *does* hold a better predictor of NFIP claims than the
+   index is. That is a real fact about a real decision, even if it is partly a
+   fact about insurance uptake.
+
+**The honest statement is that M3's headline is not safe.** It holds
+within-instrument, robustly, on eleven hazards. It reverses for the one hazard
+where an independent instrument exists. The write-up must lead with that tension
+rather than with either half of it.
+
+---
+
+## Where the project stands after M6
+
+| Milestone | Result |
+|---|---|
+| M1 | Outcome measurable — 94.9% completeness, 50.4pt interstate spread |
+| M2 | Attribution 91.1% of dollars, name pass validated at 99.87% |
+| M3 | No hazard SUPPORTED; naive beats index on 10 of 13 |
+| M4 | The weakness is discrimination, not magnitude — worse for allocation use |
+| M5 | Robust to window choice and apportionment; **not** robust to instrument choice |
+| **M6** | **The naive advantage is substantially instrument persistence, not skill** |
+
+**The finding is now a tension, not a verdict**, and that is a better project than
+the one that would have been written after M3. It required an instrument the
+index did not come from, which is the reason §3 carried NFIP from the first
+version of the pre-registration.
+
+**Still true and unchanged:** 29.15% of the index is untestable here, earthquake
+alone is 27.04%, and no sentence in this project may describe the National Risk
+Index as validated or refuted.
