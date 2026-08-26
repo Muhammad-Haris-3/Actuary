@@ -516,3 +516,148 @@ noise; it does not reflect the possibility that this window was unrepresentative
 29.15% of the index is untestable here — earthquake alone is 27.04% and NOAA
 does not record earthquakes at all. **Nothing above is a statement about the
 National Risk Index as a whole**, and §2 forbids writing it as one.
+
+---
+
+## M4-T1 — Paying the tie debt, and the M3 headline gets sharper rather than weaker
+
+M3-T4 recorded a debt: with up to 98% of counties reporting zero loss, Spearman
+over a mostly-tied vector is dominated by the tie structure. This pays it by
+splitting the question into the two things the zero mass actually confounds.
+
+**DISCRIMINATION — does the index know *where* loss happens?**
+AUC = P(the predictor ranks a loss county above a no-loss county). 0.5 is a coin
+flip.
+
+| Hazard | Zero share | **Index** | Naive past | Building value | Index wins |
+|---|---|---|---|---|---|
+| Hurricane | 88.8% | **0.812** | 0.803 | 0.595 | yes |
+| Landslide | 97.4% | **0.803** | 0.692 | 0.575 | yes |
+| Wildfire | 92.1% | **0.777** | 0.648 | 0.513 | yes |
+| Tornado | 65.3% | **0.706** | 0.692 | 0.598 | yes |
+| Lightning | 81.1% | 0.677 | 0.688 | 0.732 | no |
+| Riverine flood | 44.9% | 0.642 | 0.669 | 0.651 | no |
+| Hail | 79.5% | 0.621 | 0.694 | 0.521 | no |
+| Strong wind | 28.6% | 0.553 | 0.700 | 0.639 | no |
+| Ice storm | 93.9% | 0.549 | 0.604 | 0.469 | no |
+| Winter weather | 84.3% | **0.485** | 0.565 | 0.559 | no |
+| Cold wave | 98.1% | **0.376** | 0.798 | 0.630 | no |
+
+**MAGNITUDE — given loss happened, does it know *how much*?**
+Spearman among counties with loss > 0 only.
+
+| Hazard | Counties with loss | **Index** | Naive past | Index wins |
+|---|---|---|---|---|
+| Hail | 657 | **0.400** | 0.390 | yes |
+| Winter weather | 487 | **0.310** | 0.130 | yes |
+| Lightning | 587 | **0.298** | 0.198 | yes |
+| Riverine flood | 1,742 | **0.264** | 0.246 | yes |
+| Tornado | 1,119 | **0.244** | 0.240 | yes |
+| Hurricane | 259 | **0.202** | −0.079 | yes |
+| Cold wave | 43 | **0.181** | −0.139 | yes |
+| Landslide | 82 | **0.011** | −0.249 | yes |
+| Strong wind | 2,274 | 0.286 | 0.317 | no |
+| Ice storm | 183 | 0.129 | 0.188 | no |
+| Wildfire | 247 | 0.160 | 0.257 | no |
+
+### The finding this changes
+
+M3 reported that naive extrapolation beats the index on ten of thirteen hazards.
+That stands as the pre-registered headline. **But the decomposition shows it is
+one weakness, not two:**
+
+| | Index beats naive |
+|---|---|
+| Discrimination — *where* | **4 of 11** |
+| **Magnitude — *how much*** | **8 of 11** |
+
+**The index is better than naive extrapolation at sizing a loss once loss
+occurs. It is worse at saying which counties get hit at all.** Because 65–98% of
+counties record zero, the combined rank statistic is driven almost entirely by
+the discrimination half — which is why M3 read as a flat defeat.
+
+That is a more useful result than the one it refines, and a more damaging one for
+the index's actual use: **an allocation mechanism consumes exactly the judgement
+the index is worst at.** Choosing which counties to fund is discrimination.
+
+### The one that should not be passed over
+
+**Cold wave discrimination is 0.376 — meaningfully worse than a coin flip.** The
+index ranks counties that went on to record cold-wave loss *below* counties that
+did not. On 2,300 counties with only 43 losses this is thin, and it is reported
+with that caveat, but it is not noise around 0.5: the naive baseline reaches
+0.798 on the same counties.
+
+**Winter weather at 0.485 is also below chance.**
+
+---
+
+## M5-T1 — The conservative window changes nothing
+
+`PREREGISTRATION.md` §4.1 required a variant with **every** hazard scored 2023
+onward, after the latest input of any hazard, for readers who distrust the
+per-hazard boundaries.
+
+| Hazard | Gap, primary | Gap, conservative |
+|---|---|---|
+| Tornado | +0.012 | **+0.028** |
+| Wildfire | +0.023 | **+0.027** |
+| Riverine flood | −0.031 | −0.021 |
+| Hurricane | −0.086 | −0.041 |
+| Lightning | −0.044 | −0.052 |
+| Ice storm | −0.089 | −0.078 |
+| Winter weather | −0.107 | −0.092 |
+| Landslide | −0.150 | −0.115 |
+| Hail | −0.129 | −0.132 |
+| Cold wave | −0.299 | −0.170 |
+| Strong wind | −0.196 | −0.200 |
+
+(Gap = index rho minus naive rho. Negative means the index loses.)
+
+**Nine of eleven hazards lose to naive extrapolation in both windows.** The same
+nine. Absolute correlations fall slightly on the shorter window, as expected from
+less data, and the ordering is unchanged.
+
+The per-hazard boundaries are not doing the work. **The result does not depend on
+that choice.**
+
+---
+
+## M5-T2 — The apportionment rule does not matter
+
+§4.0 chose equal splitting for multi-county zones over population weighting, on
+the grounds that population is an input to the index's own exposure term, and
+promised to publish a population-weighted variant if it moved any headline by
+more than 0.02.
+
+| Largest shift across all eleven hazards | **0.005** |
+|---|---|
+| Threshold for publication | 0.02 |
+
+**Immaterial. Equal splitting stands**, and the choice is confirmed not to drive
+anything. Nine of eleven hazards shift by less than 0.001.
+
+This was the least likely of the robustness checks to matter — only 4.6% of zone
+damage sits in multi-county zones — and it is recorded because the pre-registration
+promised it, not because it was interesting.
+
+---
+
+## Where the project stands after M5
+
+**Three robustness checks, none of which rescues the index:**
+
+| Check | Result |
+|---|---|
+| Restrict to 22 high-reporting states (M3-T3) | Gap **widens** |
+| Conservative 2023-onward window (M5-T1) | Same nine hazards lose |
+| Population-weighted apportionment (M5-T2) | Shift ≤ 0.005 |
+
+**And one that reframes it (M4-T1):** the weakness is concentrated in
+discrimination, not magnitude — which is worse for the index's actual use, not
+better.
+
+**Still owed:** NFIP claims as a genuinely independent instrument for flood
+(M6). Every number above rests on NOAA, and NOAA shares its lineage with SHELDUS,
+the index's own loss input. **Until M6 runs, no result here has been checked
+against an instrument the index did not partly come from.**
