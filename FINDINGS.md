@@ -172,3 +172,112 @@ independent read for flood specifically.
 **SHELDUS itself is licensed and is not free.** It is therefore never used here,
 which is fortunate: using the index's own input as the outcome would be circular
 in the way that matters.
+
+---
+
+## M1-T1 — Damage reporting passes the §3 gate, but reporting practice varies by 50 points
+
+**Method.** All NOAA Storm Events detail files for 2020–2026 downloaded
+(73 MB gzipped, **439,152 events**) and parsed. `DAMAGE_PROPERTY` and
+`DAMAGE_CROPS` distinguish a blank field from an explicit zero, and the two are
+counted separately throughout.
+
+| | |
+|---|---|
+| Events | 439,152 |
+| Damage field populated | 351,999 (**80.2%**) |
+| Populated and greater than zero | 84,363 (19.2%) |
+| **Populated but exactly zero** | **267,636 (60.9%)** |
+| Blank — no figure at all | 87,153 (19.8%) |
+
+**County-year completeness: 94.9%** (19,244 of 20,275 county-years with at least
+one event carry a damage figure).
+
+**Against the §3 threshold of 60% — PASS. Point estimates are permitted.**
+
+### But reporting practice is not uniform, and the pattern is hostile
+
+| Lowest | | Highest | |
+|---|---|---|---|
+| Colorado | **49.6%** | Rhode Island | 100.0% |
+| Nebraska | 55.3% | Puerto Rico | 99.8% |
+| South Carolina | 57.1% | Louisiana | 99.7% |
+| Maine | 60.2% | Nevada | 99.4% |
+| Oklahoma | 62.7% | Mississippi | 99.4% |
+| Wyoming | 63.8% | Arizona | 99.3% |
+| Kansas | 64.7% | Florida | 99.3% |
+
+**A 50.4 point spread.** And the low-reporting states are Colorado, Nebraska,
+Oklahoma and Kansas — hail and tornado country, which is exactly where the index
+carries high expected loss.
+
+**So the index will appear to over-predict in the states that report least, for
+reasons that have nothing to do with the index.** Every state-level figure must
+be published beside that state's reporting rate, and the national result must be
+tested for sensitivity to it. This is recorded before any correlation has been
+computed.
+
+---
+
+## M1-T2 — Two thirds of the damage is not county-coded, and the fix is free
+
+This nearly ended the project, and it is the reason M1 exists.
+
+**Only 54.1% of events, and 28.0% of dollars, carry a county FIPS.** The rest are
+`CZ_TYPE='Z'` — National Weather Service forecast zones, which are not counties.
+
+**The hazards that vanish are the expensive ones:**
+
+| Event type | Damage | Share of all | County-coded |
+|---|---|---|---|
+| **Hurricane (Typhoon)** | $50.8 bn | **45.2%** | **0.0%** |
+| Wildfire | $11.4 bn | 10.1% | 0.1% |
+| Storm Surge/Tide | $5.2 bn | 4.6% | 0.0% |
+| High Wind | $4.9 bn | 4.4% | 0.0% |
+| Tropical Storm | $4.7 bn | 4.2% | 0.0% |
+| Drought | $1.7 bn | 1.5% | 0.0% |
+
+Against F0-T3: hurricane alone is **29.25% of the index's dollar value**, and
+none of its realized damage is county-coded. Taken at face value this would have
+pushed the testable share to roughly 26% — **below the 50% floor in
+`PREREGISTRATION.md` §6, which would have killed the project.**
+
+### The zone-to-county crosswalk, measured
+
+NWS publishes a zone–county correlation file, free
+(`weather.gov/source/gis/Shapefiles/County/bp16ap26.dbx`, 350 KB): 4,875 rows,
+4,080 zones, 3,269 counties.
+
+**89.8% of zones map to exactly one county** — median 1, mean 1.19, max 10. The
+apportionment problem is far smaller than the zone coding implied.
+
+| Of the $81.0 bn zone-coded damage | |
+|---|---|
+| Matched to the crosswalk | $50.5 bn (**62.3%**) |
+| ... in single-county zones, no apportionment needed | $46.8 bn (**57.7%**) |
+| ... in multi-county zones, apportionment required | $3.7 bn (4.6%) |
+| **Unmatched zone key** | **$30.5 bn (37.7%)** |
+
+**County-attributable damage rises from 28.0% to 72.9% of all dollars.**
+
+Per hazard: hurricane 57.6% recovered (all single-county), tropical storm 88.6%,
+wildfire 99.1%, drought 100%, coastal flood 95.5%, winter storm 89.3%, ice storm
+63.3%. **High wind recovers only 8.7%** and is the worst case.
+
+**§6 does not fire — conditional on using the crosswalk.** That step was not in
+the pre-registration, and v1.1 adds it with its apportionment rule fixed before
+any correlation is computed.
+
+### Two things this leaves open
+
+**$30.5 bn of zone damage does not match the crosswalk.** The file is an April
+2026 snapshot and the events run from 2020; NWS renumbers zones, so stale
+identifiers are the likely cause. Historical crosswalk versions exist and
+retrieving them is M2 work. Until then the unmatched amount is **excluded and
+published**, never silently dropped.
+
+**Building this crosswalk is reproducing part of what SHELDUS does.** SHELDUS is
+the index's own loss input, it is licensed, and apportioning NOAA zone events to
+counties is a large part of what it sells. Doing it independently is legitimate —
+and it means the apportionment rule is ours, not FEMA's, and must be stated
+wherever it bears.
