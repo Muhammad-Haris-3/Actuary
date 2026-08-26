@@ -32,25 +32,36 @@ counties that is badly underpowered for hazards that recur on decade timescales:
 a single hurricane season would dominate the result, and the test would measure
 weather rather than the index.
 
-### The publication date is not the boundary
+### The publication date is not the boundary — confirmed
 
 The index is computed from a fixed historical record, and **that record ends
 years before the file is published.**
 
-FEMA's documentation gives the loss input as **SHELDUS**, and the period of
-record as **1996–2019** for versions up to and including the March 2023 release.
-The December 2025 release (v1.20) extends it **through 2023**.
+The bundled metadata identifies the snapshot as **National Risk Index March 2023,
+version 1.19.0**, revision date **2023-03-13**. It does **not** state the period
+of record — that lives in a separate FEMA document, which is a finding in its own
+right: **the archived snapshot is not self-documenting**, and anyone reading it
+alone would have no way to know what window it was fitted on.
 
-**So the honest out-of-sample boundary is the last event that fed the index, not
-the date the file was written.** If the archived February 2025 snapshot carries
-the 1996–2019 record — which its date makes likely but does not prove — then
-losses from **2020 through 2026 are genuinely out-of-sample: roughly seven
-years, not sixteen months.**
+FEMA's version documentation for v1.19.0 states the historic loss ratio uses
+**SHELDUS Version 19.0, covering 1996–2019**, with tornado frequency, exposure
+and loss ratio drawn from **1986–2019**.
 
-**Open, and blocking §5 of the pre-registration:** which SHELDUS version the
-archived snapshot used. It is stated in the version documentation bundled with
-the download. **No holdout window is fixed until that is read**, and it is task
-one.
+| | |
+|---|---|
+| Snapshot | v1.19.0, published 2023-03-13, archived 2025-02-07 |
+| **Last event feeding the index** | **2019-12-31** |
+| Outcome data available to | 2026 (NOAA Storm Events `d2026`) |
+| **Out-of-sample window** | **2020-01-01 onward — about six and a half years** |
+
+**The naive reading would have given sixteen months and an underpowered test.**
+The honest boundary is the last event that fed the index, and it is five times
+longer.
+
+**Fixed here before any outcome data is downloaded:** the holdout begins
+**2020-01-01**. Nothing dated earlier may enter the scoring window, for any
+hazard, and tornado is *not* given an earlier start despite its longer input
+record — the boundary is the end of the record, which is 2019 for both.
 
 ### A circularity that has to be declared, not solved
 
@@ -70,8 +81,12 @@ in the way that matters.
 
 ### Consequences for the build
 
-- Files are geodatabases in zips; reading them needs `geopandas`/`fiona`
-  (free). FEMA also publishes CSV tables of the same content, which avoid the
-  GDAL dependency and should be preferred if reachable.
+- The counties geodatabase is **104 MB unzipped, 55 internal files, 479 fields**.
+  Per-hazard Expected Annual Loss is exposed as `{HAZ}_EALB` (building),
+  `{HAZ}_EALT` (total) and `{HAZ}_ALRB` (rate), with composites `EAL_VALB` and
+  `EAL_VALT`.
+- **No geospatial reader is installed** — `geopandas`, `fiona`, `pyogrio` and
+  `osgeo` are all absent; `pandas` and `pyarrow` are present. One free
+  dependency (`pyogrio`) or the CSV distribution of the same tables resolves it.
 - 401 MB of tract data is gitignored. Aggregates are committed; raw is not.
 - Nothing in the stack costs anything.
