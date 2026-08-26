@@ -372,3 +372,147 @@ the like-for-like test.
 `PREREGISTRATION.md` v1.2 fixes the comparison as **`{HAZ}_EALB + {HAZ}_EALA`
 against `DAMAGE_PROPERTY + DAMAGE_CROPS`**, before any correlation is computed.
 The population component is out of scope and said to be.
+
+---
+
+## M3-T1 — The first join. No hazard clears the bar, and ten of thirteen lose to arithmetic
+
+**Method.** Predictor `{HAZ}_EALB + {HAZ}_EALA` per `PREREGISTRATION.md` v1.2 §3.
+Outcome: attributed property and crop damage, out-of-sample only, per the
+per-hazard boundaries in §4.1. Spearman with 2,000 bootstrap replicates
+**resampled by state**, seed 20260826. Every threshold below was fixed in §4.3
+before this ran.
+
+| Hazard | Counties | With loss | Years | Realized | rho | 95% CI | Verdict |
+|---|---|---|---|---|---|---|---|
+| Hurricane | 2,308 | 259 | 5 | $26.2 bn | 0.343 | 0.207–0.444 | WEAK |
+| Riverine flood | 3,164 | 1,742 | 7 | $14.8 bn | 0.303 | 0.237–0.369 | WEAK |
+| Wildfire | 3,142 | 247 | 5 | $8.76 bn | 0.260 | 0.197–0.321 | WEAK |
+| Tornado | 3,224 | 1,119 | 5 | $5.81 bn | 0.359 | 0.275–0.440 | WEAK |
+| Hail | 3,205 | 657 | 5 | $3.99 bn | 0.191 | 0.109–0.268 | **NOT SUPPORTED** |
+| Strong wind | 3,187 | 2,274 | 5 | $2.13 bn | 0.205 | 0.066–0.357 | WEAK |
+| Winter weather | 3,094 | 487 | 5 | $0.30 bn | **-0.006** | -0.124–0.108 | **NOT SUPPORTED** |
+| Lightning | 3,108 | 587 | 7 | $0.13 bn | 0.253 | 0.200–0.305 | WEAK |
+| Ice storm | 3,002 | 183 | 7 | $0.09 bn | 0.041 | -0.039–0.125 | **NOT SUPPORTED** |
+| Landslide | 3,142 | 82 | 5 | $0.07 bn | 0.167 | 0.113–0.212 | **NOT SUPPORTED** |
+| Cold wave | 2,300 | 43 | 5 | $0.07 bn | **-0.058** | -0.137–0.021 | **NOT SUPPORTED** |
+| Avalanche | 208 | 17 | 7 | $0.001 bn | 0.248 | -0.050–0.464 | **NOT SUPPORTED** |
+| Heat wave | 2,604 | 9 | 5 | negligible | 0.039 | 0.010–0.073 | **NOT SUPPORTED** |
+
+**Not one hazard reaches SUPPORTED** (rho >= 0.5 with a lower bound above 0.3).
+The best is tornado at 0.359.
+
+---
+
+## M3-T2 — The index loses to extrapolating its own inputs
+
+`PREREGISTRATION.md` §5 fixed three reference predictors before any of this ran.
+The one that matters is **naive extrapolation**: county-level realized loss over
+2010-2019, which is a person with a spreadsheet and no index.
+
+| Hazard | Index | **Naive past** | Building value | Population | Index beats naive |
+|---|---|---|---|---|---|
+| Hurricane | 0.343 | **0.429** | 0.107 | 0.123 | no |
+| Riverine flood | 0.303 | **0.334** | 0.304 | 0.289 | no |
+| Wildfire | **0.260** | 0.237 | 0.011 | 0.019 | yes |
+| Tornado | **0.359** | 0.347 | 0.169 | 0.188 | yes |
+| Hail | 0.191 | **0.320** | 0.027 | 0.006 | no |
+| Strong wind | 0.205 | **0.401** | 0.266 | 0.274 | no |
+| Winter weather | -0.006 | **0.100** | 0.081 | 0.070 | no |
+| Lightning | 0.253 | 0.297 | **0.324** | 0.331 | no |
+| Ice storm | 0.041 | **0.130** | -0.025 | -0.007 | no |
+| Landslide | 0.167 | **0.317** | 0.042 | 0.030 | no |
+| Cold wave | -0.058 | **0.241** | 0.062 | 0.068 | no |
+| Avalanche | **0.248** | -0.102 | 0.107 | 0.129 | yes |
+| Heat wave | 0.039 | 0.052 | 0.044 | 0.045 | no |
+
+**The index is beaten by naive extrapolation on ten of thirteen hazards.**
+
+The precise claim, which is narrower and stronger than it first looks: the naive
+baseline is built from **NOAA loss over 2010-2019, which lies inside the index's
+own SHELDUS input window (1996-2019)**. This is not a rival method with better
+information. It is **the index's own inputs, used without processing, ranking
+counties better than the processed index does.**
+
+---
+
+## M3-T3 — It is not a reporting artifact
+
+`PREREGISTRATION.md` §6 makes this a kill criterion: if skill is not robust to
+state reporting practice, the finding is about NOAA rather than FEMA.
+
+The obvious worry is that the naive baseline and the outcome are **both** NOAA,
+so a county that reports damage well in 2010-2019 also reports it well in
+2020-2026, and correlated measurement error flatters the baseline.
+
+**Restricting to the 22 states reporting damage on 90%+ of events:**
+
+| Hazard | Gap, all states | Gap, high-reporting only |
+|---|---|---|
+| Hurricane | -0.086 | **-0.152** |
+| Cold wave | -0.299 | **-0.377** |
+| Hail | -0.129 | **-0.145** |
+| Lightning | -0.044 | **-0.069** |
+| Riverine flood | -0.031 | **-0.043** |
+| Wildfire | +0.023 | **-0.059** |
+| Strong wind | -0.196 | -0.122 |
+| Landslide | -0.150 | -0.041 |
+| Tornado | +0.012 | **+0.054** |
+
+(Gap = index rho minus naive rho. Negative means the index loses.)
+
+**Cleaning up reporting does not rescue the index — it mostly widens the gap.**
+Both predictors improve in high-reporting states, which is what attenuation from
+measurement noise looks like, but the *difference* between them persists and in
+six of nine cases grows. Wildfire, one of only three index wins, **reverses** and
+becomes a loss.
+
+Tornado is the exception that strengthens: the index's advantage grows from
++0.012 to +0.054.
+
+**The §6 kill criterion does not fire.** The finding is about the index.
+
+---
+
+## M3-T4 — What the index does do well, and three things this cannot say
+
+**It concentrates loss.** The top decile of counties by index EAL captures a
+large share of what actually happened:
+
+| Hazard | Top-decile capture |
+|---|---|
+| Wildfire | **89.0%** |
+| Hurricane | 64.5% |
+| Hail | 62.9% |
+| Riverine flood | 55.2% |
+| Tornado | 45.1% |
+| Lightning | 43.5% |
+
+**So the index is not useless.** It identifies where the big losses land. What it
+does poorly is *rank* counties against each other, which is what an allocation
+mechanism actually consumes.
+
+### Three things that cannot be concluded
+
+**1. Nothing about calibration.** Realized loss runs at 0.25-0.51 of the index's
+expectation over the window. That looks like systematic over-prediction and
+**must not be reported as such**: NOAA damage is known to undercount, our
+attribution excludes 8.9% of dollars, and 2020-2026 may simply have been quiet.
+The three are not separable here. **The calibration column is published and
+explicitly labelled uninterpretable.**
+
+**2. The rank statistic is strained by ties.** Hurricane has 259 counties with
+loss out of 2,308 — 89% zeros. Spearman over a mostly-tied vector is dominated by
+the tie structure, and the capture statistic is more informative for the rare
+hazards. Both were pre-registered, so neither was chosen after the fact, but a
+tie-aware alternative belongs in M5 and is recorded as owed.
+
+**3. Five to seven years is short for hurricane.** $26.2 bn of hurricane loss over
+five out-of-sample years is a handful of storms. The interval reflects sampling
+noise; it does not reflect the possibility that this window was unrepresentative.
+
+### And the standing limitations
+
+29.15% of the index is untestable here — earthquake alone is 27.04% and NOAA
+does not record earthquakes at all. **Nothing above is a statement about the
+National Risk Index as a whole**, and §2 forbids writing it as one.
